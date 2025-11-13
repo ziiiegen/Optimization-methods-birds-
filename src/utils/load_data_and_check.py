@@ -10,9 +10,12 @@ class Birds():
         self.file_name = file_name
 
 def prepare_data(data_birds):
-    data = data_birds
+    """ 
+    Функция убирает первую, последнюю строки и пустые ветки, оставляя только полные
+    Также делает set из букв
+    """
+    data = data_birds[5:-3]
 
-    data = data[5:-3]
     set_birds_data = {x for x in set(data) if x.isalpha()}
 
     for i in range(len(data)-1, 0, -1):
@@ -23,6 +26,9 @@ def prepare_data(data_birds):
     return data, set_birds_data
 
 def count_branch_in_file(file_birds, data_birds, prepared_arr_birds):
+    """
+    Функция для подсчета веток с помощью вхождения \n 
+    """
     count_string_file = data_birds.count('\n')
     count_string_prepare_arr = prepared_arr_birds.count('\n')
     file_birds.count_branch = count_string_file - 2
@@ -30,6 +36,9 @@ def count_branch_in_file(file_birds, data_birds, prepared_arr_birds):
     file_birds.count_empty_branch = count_string_file - count_string_prepare_arr - 3
 
 def check_birds_on_branch(prepared_arr_birds, end_string_id, file):
+    """
+    Функция проверяет, что каждая ветка с птицами полностью заполнена
+    """
     count_symbol_in_string = 0
     flag = True
 
@@ -44,6 +53,9 @@ def check_birds_on_branch(prepared_arr_birds, end_string_id, file):
     return flag
 
 def creation_dictionary_birds(prepared_arr_birds, set_birds_data):
+    """
+    Функция создает словарь, где ключ - птица, значение - ее количество на ветках
+    """
     dict_birds = {}
 
     for i in set_birds_data:
@@ -55,6 +67,9 @@ def creation_dictionary_birds(prepared_arr_birds, set_birds_data):
     return dict_birds
 
 def check_miltiplicity_birds_of_branch(dict_birds, end_string_id, file):
+    """
+    Функция проверяет кратность количества птиц размеру ветки
+    """
     count_birds_on_branch = (end_string_id+ 1)/2 
     flag = True
     for key, value in dict_birds.items():
@@ -65,7 +80,10 @@ def check_miltiplicity_birds_of_branch(dict_birds, end_string_id, file):
     return [flag]
 
 def print_summary(file_birds):
-            print(
+    """
+    Функция выводит результаты
+    """    
+    print(
             f"""
 
     Проверка файла {file_birds.file_name}
@@ -79,8 +97,7 @@ def print_summary(file_birds):
 Длина заполненных веток: {file_birds.birds_on_branch}
 Кратность птиц одного типа: {file_birds.miltiplicity_birds}
 
-"""
-        )
+""")
 
 def check_file(input_file, save=False):
     current_dir = os.path.dirname(__file__)
@@ -108,7 +125,10 @@ def check_file(input_file, save=False):
         result_birds = check_miltiplicity_birds_of_branch(dict_birds, end_string_id, file)
         file_birds.miltiplicity_birds = result_birds
 
-        print_summary(file_birds)
+        if save:
+            pass
+        else:
+            print_summary(file_birds)
 
 
 if __name__ == '__main__':
