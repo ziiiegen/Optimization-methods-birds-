@@ -1,5 +1,5 @@
 """
-Функция загружает данные из файла обрабатывает их и проверяет на удовлетворение условий проекту.
+Скрипт загружает данные из файла обрабатывает их и проверяет на удовлетворение условий проекту.
 Также создает класс для каждого файла отдельно, загружая в него характеристи файла и результаты проверки.
 """
 
@@ -12,11 +12,11 @@ class Birds():
 
 def prepare_data(data_birds):
     """ 
-    Функция убирает первую, последнюю строки и пустые ветки, оставляя только полные
-    Также делает set из букв
+    Функция обрабатывыет входной файл с птицами
+    data - все ветки с птицами без пробелов
+    set_birds_data - уникальные птицы
     """
     data = data_birds[5:-3]
-    print(data)
 
     set_birds_data = {x for x in set(data) if x.isalpha()}
 
@@ -25,7 +25,7 @@ def prepare_data(data_birds):
             data = data[:i+1]
             break
 
-    return data, set_birds_data
+    return data.replace(" ", ""), set_birds_data
 
 def count_branch_in_file(file_birds, data_birds, prepared_arr_birds):
     """
@@ -33,21 +33,28 @@ def count_branch_in_file(file_birds, data_birds, prepared_arr_birds):
     """
     count_string_file = data_birds.count('\n')
     count_string_prepare_arr = prepared_arr_birds.count('\n')
+
     file_birds.count_branch = count_string_file - 2
     file_birds.count_full_branch = count_string_prepare_arr + 1
     file_birds.count_empty_branch = count_string_file - count_string_prepare_arr - 3
 
-def check_birds_on_branch(prepared_arr_birds, end_string_id, file):
+def check_count_birds_on_branch(prepared_arr_birds):
     """
-    Функция проверяет, что каждая ветка с птицами полностью заполнена
+    Функция проверяет, что каждая ветка с птицами полностью заполнена.
+    Возвращает результат проверки и длину ветки (колличество птиц на ветке).
     """
+    len_first_string = prepared_arr_birds.find('\n')
+
     count_symbol_in_string = 0
-    flag = True
+    # flag = True
+    flag = [True, 0]
 
     for bird in prepared_arr_birds:
-        if (bird == '\n') and (end_string_id != count_symbol_in_string):
-            flag = False
-        elif (bird == '\n') and (end_string_id == count_symbol_in_string):
+        if (bird == '\n') and (len_first_string != count_symbol_in_string):
+            flag = [False, None]
+            break
+        elif (bird == '\n') and (len_first_string == count_symbol_in_string):
+            flag = [True, count_symbol_in_string]
             count_symbol_in_string = 0
         else:
             count_symbol_in_string += 1
@@ -68,18 +75,18 @@ def creation_dictionary_birds(prepared_arr_birds, set_birds_data):
     
     return dict_birds
 
-def check_miltiplicity_birds_of_branch(dict_birds, end_string_id, file):
+def check_miltiplicity_birds_of_branch(file_birds):
     """
     Функция проверяет кратность количества птиц размеру ветки
     """
-    count_birds_on_branch = (end_string_id+ 1)/2 
-    flag = True
-    for key, value in dict_birds.items():
-        if value % count_birds_on_branch != 0:
-            flag = False
-            result = [key, flag]
+    if (file_birds.birds_on_branch[0] == False):
+        return [False, None]
+    
+    for key, value in file_birds.dict_birds.items():
+        if value % file_birds.birds_on_branch[1] != 0:
+            result = [False, key]
             return result
-    return [flag]
+    return [True]
 
 def print_summary(file_birds):
     """
@@ -100,7 +107,7 @@ def print_summary(file_birds):
     print("-" * 30)
     print(f"""
     Длина заполненных веток: {file_birds.birds_on_branch}
-    Кратность птиц одного типа: {file_birds.miltiplicity_birds[0]}
+    Кратность птиц одного типа: {file_birds.miltiplicity_birds}
     """)
     print("=" * 50)
 
@@ -118,16 +125,13 @@ def check_file(input_file, save=False):
 
         count_branch_in_file(file_birds, data_birds, prepared_arr_birds)
 
-        end_string_id = prepared_arr_birds.find('\n')
-        file_birds.len_full_branch = int((end_string_id + 1) / 2)
-
-        result_branch = check_birds_on_branch(prepared_arr_birds, end_string_id, file)
+        result_branch = check_count_birds_on_branch(prepared_arr_birds)
         file_birds.birds_on_branch = result_branch
 
         dict_birds = creation_dictionary_birds(prepared_arr_birds, set_birds_data)
         file_birds.dict_birds = dict_birds
 
-        result_birds = check_miltiplicity_birds_of_branch(dict_birds, end_string_id, file)
+        result_birds = check_miltiplicity_birds_of_branch(file_birds)
         file_birds.miltiplicity_birds = result_birds
 
         if save:
