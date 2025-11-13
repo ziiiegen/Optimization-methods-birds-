@@ -4,6 +4,7 @@
 """
 
 import os
+import pandas as pd
 
 class Birds():
     def __init__(self, file_name):
@@ -15,6 +16,7 @@ def prepare_data(data_birds):
     Также делает set из букв
     """
     data = data_birds[5:-3]
+    print(data)
 
     set_birds_data = {x for x in set(data) if x.isalpha()}
 
@@ -83,21 +85,24 @@ def print_summary(file_birds):
     """
     Функция выводит результаты
     """    
-    print(
-            f"""
+    print("=" * 50)
+    print(f"""
+    Проверка файла: {file_birds.file_name[1:]}
+    Количество веток: {file_birds.count_branch}
+    Количество заполненных веток: {file_birds.count_full_branch}
+    Количество пустых веток: {file_birds.count_empty_branch}
+    """)
+    print("-" * 30)
 
-    Проверка файла {file_birds.file_name}
-Количество веток: {file_birds.count_branch}
-Количество заполненных веток: {file_birds.count_full_branch}
-Количество пустых веток: {file_birds.count_empty_branch}
+    df = pd.DataFrame(list(file_birds.dict_birds.items()), columns=['Птица', 'Количество'])
+    print(df)
 
-Типы и количество птиц:
-{file_birds.dict_birds}
-
-Длина заполненных веток: {file_birds.birds_on_branch}
-Кратность птиц одного типа: {file_birds.miltiplicity_birds}
-
-""")
+    print("-" * 30)
+    print(f"""
+    Длина заполненных веток: {file_birds.birds_on_branch}
+    Кратность птиц одного типа: {file_birds.miltiplicity_birds[0]}
+    """)
+    print("=" * 50)
 
 def check_file(input_file, save=False):
     current_dir = os.path.dirname(__file__)
@@ -129,7 +134,6 @@ def check_file(input_file, save=False):
             pass
         else:
             print_summary(file_birds)
-
 
 if __name__ == '__main__':
     INPUT_FILE = ["/BIRDS_3.txt", "/BIRDS_4.txt", "/BIRDS_5.txt", "/BIRDS_6.txt",
