@@ -111,15 +111,23 @@ def print_summary(file_birds):
     Длина заполненных веток: {file_birds.birds_on_branch}
     Кратность птиц одного типа: {file_birds.miltiplicity_birds}
     """)
+    if(file_birds.birds_on_branch[0] and file_birds.miltiplicity_birds[0]):
+        print(f"ФАЙЛ {file_birds.file_name[1:]} КОРРЕКТНЫЙ")
+    else: print(f"ФАЙЛ {file_birds.file_name[1:]} НЕКОРРЕКТНЫЙ")
     print("=" * 50)
 
 def check_file(input_file, save=True):
     current_dir = os.path.dirname(__file__)
     input_dir = os.path.join(current_dir, '..', '..', 'data', 'input')
-    output_dir=os.path.join(current_dir,'..','..','data','output')
+    output_dir = os.path.join(current_dir,'..','..','data','output')
     os.makedirs(output_dir,exist_ok=True)
 
-    report_path=os.path.join(output_dir,"report.txt")
+    report_path = os.path.join(output_dir,"report.txt")
+
+    if (save):
+        with open(report_path, "w", encoding="utf-8") as f: # Очистка файла
+            f.write("")
+
     for file in input_file:
         file_birds = Birds(file)
 
@@ -139,16 +147,15 @@ def check_file(input_file, save=True):
         result_birds = check_miltiplicity_birds_of_branch(file_birds)
         file_birds.miltiplicity_birds = result_birds
 
-        if save:
-
-            buffer=io.StringIO()
-            old_stdout=sys.stdout
-            sys.stdout=buffer
+        if (save):
+            buffer = io.StringIO()
+            old_stdout = sys.stdout
+            sys.stdout = buffer
 
             try:
                 print_summary(file_birds)
             finally:
-                sys.stdout=old_stdout
+                sys.stdout = old_stdout
 
             with open(report_path,"a",encoding="utf-8") as f:
                 f.write(buffer.getvalue())
