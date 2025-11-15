@@ -5,6 +5,8 @@
 
 import os
 import pandas as pd
+import io
+import sys
 
 class Birds():
     def __init__(self, file_name):
@@ -111,10 +113,13 @@ def print_summary(file_birds):
     """)
     print("=" * 50)
 
-def check_file(input_file, save=False):
+def check_file(input_file, save=True):
     current_dir = os.path.dirname(__file__)
     input_dir = os.path.join(current_dir, '..', '..', 'data', 'input')
+    output_dir=os.path.join(current_dir,'..','..','data','output')
+    os.makedirs(output_dir,exist_ok=True)
 
+    report_path=os.path.join(output_dir,"report.txt")
     for file in input_file:
         file_birds = Birds(file)
 
@@ -135,7 +140,19 @@ def check_file(input_file, save=False):
         file_birds.miltiplicity_birds = result_birds
 
         if save:
-            pass
+
+            buffer=io.StringIO()
+            old_stdout=sys.stdout
+            sys.stdout=buffer
+
+            try:
+                print_summary(file_birds)
+            finally:
+                sys.stdout=old_stdout
+
+            with open(report_path,"a",encoding="utf-8") as f:
+                f.write(buffer.getvalue())
+
         else:
             print_summary(file_birds)
 
